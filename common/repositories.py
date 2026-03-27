@@ -20,21 +20,9 @@ class BaseRepository:
     user_field = "user"
 
     def __init__(self, user=None):
-        """
-        Initialize repository with optional user.
-
-        Args:
-            user: User object to scope queries. If None, queries are global.
-        """
         self.user = user
 
     def _get_base_queryset(self):
-        """
-        Get base queryset, optionally filtered by user.
-
-        Returns:
-            QuerySet filtered by user if user is set, otherwise all objects.
-        """
         queryset = self.model.objects.all()
 
         if self.user and hasattr(self.model, self.user_field):
@@ -48,30 +36,12 @@ class BaseRepository:
         return self._get_base_queryset()
 
     def get_by_id(self, obj_id):
-        """
-        Get single object by ID (for current user if set).
-
-        Args:
-            obj_id: Object ID
-
-        Returns:
-            Object instance or None if not found
-        """
         try:
             return self._get_base_queryset().get(id=obj_id)
         except ObjectDoesNotExist:
             return None
 
     def create(self, **kwargs):
-        """
-        Create new object (auto-adds user if set).
-
-        Args:
-            **kwargs: Field values
-
-        Returns:
-            Created object instance
-        """
         if (
             self.user
             and self.user_field not in kwargs
@@ -82,16 +52,6 @@ class BaseRepository:
         return self.model.objects.create(**kwargs)
 
     def update(self, obj_id, **kwargs):
-        """
-        Update object (only if belongs to user if user is set).
-
-        Args:
-            obj_id: Object ID
-            **kwargs: Fields to update
-
-        Returns:
-            Updated object or None if not found
-        """
         obj = self.get_by_id(obj_id)
         if obj:
             for key, value in kwargs.items():
@@ -101,15 +61,6 @@ class BaseRepository:
         return None
 
     def delete(self, obj_id) -> bool:
-        """
-        Delete object (only if belongs to user if user is set).
-
-        Args:
-            obj_id: Object ID
-
-        Returns:
-            True if deleted, False if not found
-        """
         obj = self.get_by_id(obj_id)
         if obj:
             obj.delete()
@@ -117,22 +68,7 @@ class BaseRepository:
         return False
 
     def count(self):
-        """
-        Count objects (for current user if set).
-
-        Returns:
-            int: Number of objects
-        """
         return self._get_base_queryset().count()
 
     def exists(self, **kwargs):
-        """
-        Check if object exists (for current user if set).
-
-        Args:
-            **kwargs: Filter criteria
-
-        Returns:
-            bool: True if exists
-        """
         return self._get_base_queryset().filter(**kwargs).exists()
