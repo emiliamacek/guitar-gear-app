@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ToneVault{% endblock %}</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-body: #121212;
+            --bg-sidebar: #0f0f0f;
+            --bg-card: #1e1e1e;
+            --bg-input: #2c2c2c;
+            --border-color: #333;
+            --text-main: #e0e0e0;
+            --text-muted: #a0a0a0;
+            --accent-color: #e67e22;
+            --accent-hover: #d35400;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        #wrapper {
+            overflow-x: hidden;
+        }
+
+        #sidebar-wrapper {
+            min-height: 100vh;
+            width: 16rem;
+            margin-left: -16rem;
+            
+            /* Flex properties */
+            flex-shrink: 0; /* ✅ Nie pozwól sidebarowi się ścisnąć */
+            
+            transition: margin 0.25s ease-out;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+        }
+
+        #sidebar-wrapper .sidebar-heading {
+            padding: 1.5rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-main);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .brand-icon { color: var(--accent-color); }
+
+        /* --- CONTENT WRAPPER --- */
+        #page-content-wrapper {
+            flex-grow: 1; /* ✅ Wypełnij resztę miejsca */
+            min-width: 0; /* Zapobiega problemom z overflow w flexboxie */
+            width: 100%;
+            transition: all 0.25s ease-out;
+        }
+
+        /* --- TOGGLE LOGIC (Mobile First) --- */
+        
+        /* Stan włączony (po kliknięciu na mobile lub domyślnie nic na desktopie) */
+        #wrapper.toggled #sidebar-wrapper {
+            margin-left: 0;
+        }
+
+        /* --- DESKTOP MEDIA QUERY (min-width: 768px) --- */
+        @media (min-width: 768px) {
+            /* Na Desktopie sidebar jest domyślnie widoczny (margin 0) */
+            #sidebar-wrapper {
+                margin-left: 0;
+            }
+
+            /* Na Desktopie, jak dodamy klasę .toggled, to CHOWAMY sidebar (-16rem) */
+            #wrapper.toggled #sidebar-wrapper {
+                margin-left: -16rem;
+            }
+        }
+
+        /* --- LIST ITEMS --- */
+        .list-group-item {
+            background-color: transparent;
+            color: var(--text-muted);
+            border: none;
+            padding: 0.9rem 1.5rem;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .list-group-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: #fff;
+        }
+        
+        .list-group-item.active-link {
+            color: #fff;
+            border-left-color: var(--accent-color);
+            background: linear-gradient(90deg, rgba(230, 126, 34, 0.1) 0%, transparent 100%);
+        }
+
+        .sidebar-submenu .list-group-item {
+            padding-left: 2.5rem;
+            font-size: 0.9rem;
+        }
+
+        /* --- NAVBAR & UI ELEMENTS --- */
+        .navbar {
+            background-color: var(--bg-sidebar) !important;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .btn-outline-custom {
+            color: var(--text-main);
+            border-color: var(--border-color);
+        }
+        .btn-outline-custom:hover {
+            background-color: var(--bg-card);
+            color: #fff;
+        }
+
+        .form-control, .form-select {
+            background-color: var(--bg-input);
+            border: 1px solid var(--border-color);
+            color: #fff;
+            padding: 10px 15px;
+        }
+
+        .form-control:focus, .form-select:focus {
+            background-color: var(--bg-input);
+            border-color: var(--accent-color);
+            color: #fff;
+            box-shadow: 0 0 0 0.25rem rgba(230, 126, 34, 0.25);
+        }
+        
+        ::placeholder { color: #666 !important; opacity: 1; }
+
+        .card, article {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2, h3, h4, h5 { color: #fff; font-weight: 600; }
+        .text-muted { color: var(--text-muted) !important; }
+
+        .btn-primary {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+            font-weight: 600;
+        }
+        .btn-primary:hover {
+            background-color: var(--accent-hover);
+            border-color: var(--accent-hover);
+        }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body>
+
+    <div class="d-flex" id="wrapper">
+        
+        <div id="sidebar-wrapper">
+            <div class="sidebar-heading">
+                <a href="{% url 'home' %}" class="text-decoration-none text-white d-flex align-items-center gap-2">
+                    <i class="fas fa-layer-group brand-icon"></i> 
+                    ToneVault
+                </a>
+            </div>
+            
+            <div class="list-group list-group-flush mt-3">
+                {% if user.is_authenticated %}
+                    <small class="px-4 text-muted text-uppercase" style="font-size: 0.75rem; font-weight: 600;">Main</small>
+                    
+                    <a href="{% url 'equipment:list' %}" class="list-group-item list-group-item-action {% if request.resolver_match.view_name == 'equipment:list' %}active-link{% endif %}">
+                        <i class="fas fa-guitar me-3" style="width: 20px; text-align: center;"></i> My Gear
+                    </a>
+
+                    <a href="{% url 'setups:list' %}" class="list-group-item list-group-item-action {% if request.resolver_match.view_name == 'setups:list' %}active-link{% endif %}">
+                        <i class="fas fa-sliders-h me-3" style="width: 20px; text-align: center;"></i> Setups
+                    </a>
+
+                    <a href="{% url 'setups:community' %}" class="list-group-item list-group-item-action {% if request.resolver_match.view_name == 'setups:community' %}active-link{% endif %}">
+                        <i class="fas fa-users me-3" style="width: 20px; text-align: center;"></i> Community
+                    </a>
+
+                    <a href="{% url 'setups:saved' %}" class="list-group-item list-group-item-action {% if 'saved' in request.path %}active-link{% endif %}">
+                        <i class="fas fa-bookmark me-3" style="width: 20px; text-align: center;"></i> Saved
+                    </a>
+
+                    <div class="my-3"></div> <small class="px-4 text-muted text-uppercase" style="font-size: 0.75rem; font-weight: 600;">Actions</small>
+
+                    <a href="#submenuAdd" data-bs-toggle="collapse" class="list-group-item list-group-item-action dropdown-toggle">
+                        <i class="fas fa-plus-circle me-3" style="width: 20px; text-align: center;"></i> Add New
+                    </a>
+                    <div class="collapse sidebar-submenu" id="submenuAdd">
+                        <a href="{% url 'setups:create' %}" class="list-group-item list-group-item-action">✨ New Setup</a>
+                        <a href="{% url 'equipment:add_custom' 'guitar' %}" class="list-group-item list-group-item-action">🎸 Guitar</a>
+                        <a href="{% url 'equipment:add_custom' 'amplifier' %}" class="list-group-item list-group-item-action">📢 Amplifier</a>
+                        <a href="{% url 'equipment:add_custom' 'pedal' %}" class="list-group-item list-group-item-action">🎛️ Pedal</a>
+                    </div>
+
+                    <div style="margin-top: auto; padding-top: 20px;">
+                        <form action="{% url 'logout' %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="list-group-item list-group-item-action text-danger">
+                                <i class="fas fa-sign-out-alt me-3" style="width: 20px; text-align: center;"></i> Logout
+                            </button>
+                        </form>
+                    </div>
+
+                {% else %}
+                    <a href="{% url 'login' %}" class="list-group-item list-group-item-action">Login</a>
+                    <a href="{% url 'register' %}" class="list-group-item list-group-item-action">Sign Up</a>
+                {% endif %}
+            </div>
+        </div>
+        <div id="page-content-wrapper">
+            
+            <nav class="navbar navbar-expand-lg">
+                <div class="container-fluid px-4">
+                    <button class="btn btn-outline-custom btn-sm" id="sidebarToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+
+                    <div class="ms-auto d-flex align-items-center">
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'profile' user.username %}" class="d-flex align-items-center text-decoration-none text-reset">
+                                <div class="text-end me-3 d-none d-sm-block">
+                                    <div style="font-weight: 600; font-size: 0.9rem; color: #fff;">{{ user.username }}</div>
+                                    <div style="font-size: 0.75rem;" class="text-muted">Guitarist</div>
+                                </div>
+                                <div class="rounded-circle d-flex justify-content-center align-items-center text-white fw-bold shadow-sm" 
+                                     style="width: 40px; height: 40px; background-color: var(--accent-color); border: 2px solid rgba(255,255,255,0.1);">
+                                    {{ user.username|make_list|first|upper }}
+                                </div>
+                            </a>
+                        {% else %}
+                            <a href="{% url 'login' %}" class="btn btn-primary btn-sm">Login</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </nav>
+
+
+            <div class="container-fluid px-4 py-4">
+                
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert" 
+                             style="background-color: var(--bg-card); border-color: var(--border-color); color: #fff;">
+                            {% if message.tags == 'success' %}✅{% elif message.tags == 'error' %}❌{% endif %} 
+                            {{ message }}
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                {% block content %}
+                {% endblock %}
+                
+            </div>
+        </div>
+        </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Skrypt opakowany w EventListener, żeby mieć pewność, że HTML się załadował
+        document.addEventListener("DOMContentLoaded", function() {
+            var el = document.getElementById("wrapper");
+            var toggleButton = document.getElementById("sidebarToggle");
+            
+            if (toggleButton) {
+                toggleButton.onclick = function () {
+                    el.classList.toggle("toggled");
+                };
+            }
+        });
+    </script>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>

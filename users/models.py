@@ -17,10 +17,6 @@ class User(AbstractUser):
 
     bio = models.TextField(blank=True, help_text="Tell something about yourself")
 
-    # TODO:
-    # website = models.URLField(blank=True, help_text="Link to SoundCloud/YouTube/Instagram")
-    # avatar = models.ImageField(upload_to="avatars/", blank=True, null=True)
-
     def __str__(self):
         return self.username
 

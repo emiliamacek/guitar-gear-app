@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container" style="max-width: 800px; margin-top: 50px; text-align: center;">
+  <h2>🎸 Add New Gear</h2>
+  <p class="text-muted">What kind of custom gear are you adding?</p>
+
+  <div class="grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 30px;">
+    <a href="{% url 'equipment:add_custom' 'guitar' %}" role="button" class="contrast outline"
+      style="padding: 40px; text-decoration: none;">
+      <div style="font-size: 3rem;">🎸</div>
+      <h3>Guitar</h3>
+      <small>Electric, Acoustic, Bass</small>
+    </a>
+
+    <a href="{% url 'equipment:add_custom' 'amplifier' %}" role="button" class="contrast outline"
+      style="padding: 40px; text-decoration: none;">
+      <div style="font-size: 3rem;">📢</div>
+      <h3>Amplifier</h3>
+      <small>Head, Combo, Rack</small>
+    </a>
+
+    <a href="{% url 'equipment:add_custom' 'pedal' %}" role="button" class="contrast outline"
+      style="padding: 40px; text-decoration: none;">
+      <div style="font-size: 3rem;">🎛️</div>
+      <h3>Pedal</h3>
+      <small>Stompboxes & Effects</small>
+    </a>
+  </div>
+
+  <hr>
+
+<hr class="border-secondary my-4">
+
+  <div class="mt-4">
+    <a href="{% url 'equipment:catalog_search' %}" class="btn btn-outline-light w-100 p-4" style="border-style: dashed;">
+        <i class="fas fa-search mb-2" style="font-size: 2rem;"></i>
+        <h4 class="mb-1">Looking for standard gear?</h4>
+        <p class="text-muted mb-0">Search our global catalog instead of adding manually.</p>
+    </a>
+  </div>
+</div>
+{% endblock %}

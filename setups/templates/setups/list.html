@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}My Setups | ToneVault{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-0 text-white">My Setups</h2>
+            <p class="text-muted mb-0">Manage your stored configurations ({{ setups.count }})</p>
+        </div>
+        <div>
+            <a href="{% url 'setups:create' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i> Add New Setup
+            </a>
+        </div>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
+        {% for setup in setups %}
+        <div class="col">
+            <div class="card h-100 border-secondary" style="background: var(--bg-card);">
+                <div class="card-body d-flex flex-column">
+                    
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 class="card-title mb-0 text-truncate">
+                            <a href="{% url 'setups:detail' setup.pk %}" class="text-white text-decoration-none stretched-link">
+                                {{ setup.name }}
+                            </a>
+                        </h5>
+                        
+                        {% if setup.is_public %}
+                            <span class="badge bg-success" title="Visible to everyone">
+                                <i class="fas fa-globe-americas"></i>
+                            </span>
+                        {% else %}
+                            <span class="badge bg-secondary" title="Private only">
+                                <i class="fas fa-lock"></i>
+                            </span>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        {% if setup.song %}
+                            <small class="text-white d-block">
+                                <i class="fas fa-music text-muted me-1"></i> {{ setup.song.title }}
+                            </small>
+                            <small class="text-muted d-block ms-3">
+                                by {{ setup.song.band.name }}
+                            </small>
+                        {% elif setup.band %}
+                            <small class="text-white">
+                                <i class="fas fa-guitar text-muted me-1"></i> {{ setup.band.name }}
+                            </small>
+                        {% else %}
+                            <small class="text-muted fst-italic">
+                                <i class="fas fa-question-circle me-1"></i> Generic / No Artist
+                            </small>
+                        {% endif %}
+                    </div>
+
+                    <div class="mt-auto">
+                        <span class="badge bg-dark border border-secondary text-muted fw-normal">
+                            {{ setup.genre.name|default:"Uncategorized" }}
+                        </span>
+                        <small class="text-muted ms-2" style="font-size: 0.8rem;">
+                            {{ setup.signal_chain.count }} items
+                        </small>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-transparent border-secondary d-flex justify-content-between align-items-center">
+                    <small class="text-muted" style="font-size: 0.75rem;">
+                        {{ setup.created_at|date:"M d, Y" }}
+                    </small>
+                    
+                    <a href="{% url 'setups:update' setup.pk %}" class="btn btn-sm btn-outline-warning" style="position: relative; z-index: 2;">
+                        <i class="fas fa-edit"></i> Edit
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        {% empty %}
+        <div class="col-12">
+            <div class="text-center py-5 rounded-3" style="border: 2px dashed var(--border-color);">
+                <div class="mb-3" style="font-size: 3rem; color: var(--text-muted); opacity: 0.3;">
+                    <i class="fas fa-sliders-h"></i>
+                </div>
+                <h3 class="text-muted">Your sound library is empty! 🕸️</h3>
+                <p class="text-muted mb-4">Start by creating your first gear configuration.</p>
+                <a href="{% url 'setups:create' %}" class="btn btn-primary btn-lg">
+                    Create First Setup
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+{% endblock %}

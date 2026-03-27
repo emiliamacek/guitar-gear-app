@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        
+        <div class="col-md-3 mb-4">
+            <div class="card border-0 shadow-sm" style="background: var(--bg-card); position: sticky; top: 100px;">
+                <div class="card-body">
+                    <h5 class="mb-3 text-white"><i class="fas fa-filter"></i> Filters</h5>
+                    
+                    <form method="get">
+                        <div class="mb-3">
+                            <label class="form-label text-muted small">Search Name</label>
+                            <input type="text" name="q" class="form-control" placeholder="Model name..." value="{{ search_query }}">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-muted small">Gear Type</label>
+                            <select name="type" class="form-select">
+                                <option value="">All Types</option>
+                                <option value="guitar" {% if active_type == 'guitar' %}selected{% endif %}>🎸 Guitars</option>
+                                <option value="amplifier" {% if active_type == 'amplifier' %}selected{% endif %}>📢 Amplifiers</option>
+                                <option value="pedal" {% if active_type == 'pedal' %}selected{% endif %}>🎛️ Pedals</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-muted small">Brand</label>
+                            <select name="brand" class="form-select">
+                                <option value="">All Brands</option>
+                                {% for brand in brands %}
+                                    <option value="{{ brand.id }}" {% if active_brand|stringformat:"s" == brand.id|stringformat:"s" %}selected{% endif %}>
+                                        {{ brand.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-primary" type="submit">Apply Filters</button>
+                            <a href="{% url 'equipment:catalog_search' %}" class="btn btn-outline-secondary btn-sm">Clear All</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="mt-4 text-center">
+                <p class="text-muted small">Can't find it?</p>
+                <a href="{% url 'equipment:request_gear' %}" class="btn btn-outline-warning btn-sm w-100">
+                    <i class="fas fa-plus-circle"></i> Request New Item
+                </a>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <h3 class="mb-4">Catalog Results</h3>
+
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                {% for item in results %}
+                <div class="col">
+                    <div class="card h-100 border-secondary gear-card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="badge bg-dark border border-secondary text-uppercase">{{ item.brand.name }}</span>
+                                
+                                <span class="text-muted" title="{{ item.type|title }}">
+                                    {% if item.type == 'guitar' %}<i class="fas fa-guitar"></i>
+                                    {% elif item.type == 'amplifier' %}<i class="fas fa-bullhorn"></i>
+                                    {% elif item.type == 'pedal' %}<i class="fas fa-sliders-h"></i>
+                                    {% endif %}
+                                </span>
+                            </div>
+                            
+                            <h5 class="card-title text-white mt-2">{{ item.name }}</h5>
+                            
+                            <p class="text-muted small mb-4">
+                                {% if item.type == 'guitar' %}
+                                    {{ item.body_shape }} Body • {{ item.num_strings }} Strings
+                                {% elif item.type == 'amplifier' %}
+                                    {{ item.amp_type }} • {{ item.wattage }}W
+                                {% elif item.type == 'pedal' %}
+                                    {{ item.pedal_type }} Effect
+                                {% endif %}
+                            </p>
+
+                            <form action="{% url 'equipment:catalog_add' item.type item.pk %}" method="post" class="mt-auto">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success btn-sm w-100">
+                                    <i class="fas fa-plus"></i> Add to Collection
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12 text-center py-5">
+                    <div class="mb-3" style="font-size: 3rem; color: var(--text-muted); opacity: 0.3;">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h4>No gear found</h4>
+                    <p class="text-muted">Try adjusting your filters or search query.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+    </div>
+</div>
+{% endblock %}

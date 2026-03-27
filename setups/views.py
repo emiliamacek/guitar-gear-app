@@ -1,5 +1,5 @@
-from django.views.generic import CreateView, DetailView, ListView, View, UpdateView
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import CreateView, DetailView, ListView, View, UpdateView, DeleteView
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy, reverse
 from django.shortcuts import redirect, get_object_or_404
 from django.contrib import messages
@@ -62,7 +62,6 @@ class SetupDetailView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
-        # Form for adding gear
         context['add_gear_form'] = AddGearToSetupForm(user=self.request.user)
         
         # Signal chain (already prefetched by service)
@@ -101,23 +100,40 @@ class SetupDetailView(LoginRequiredMixin, DetailView):
         context['add_gear_form'] = form
         return self.render_to_response(context)
 
-class SetupUpdateView(LoginRequiredMixin, UpdateView):
+class SetupUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     """
-    User can only edit their setup
+    User can only edit their own setup
     """
     model = Setup
     form_class = SetupForm
-    template_name = 'setups/update.html'
+    template_name = 'setups/edit.html'
+    context_object_name = 'setup'
 
-    def get_queryset(self):
-        return Setup.objects.filter(user=self.request.user)
+    def test_func(self):
+        setup = self.get_object()
+        return self.request.user == setup.user
 
     def get_success_url(self):
+        messages.success(self.request, "Setup updated successfully!")
         return reverse('setups:detail', kwargs={'pk': self.object.pk})
 
-class RemoveGearFromSetupView(LoginRequiredMixin, View):
-    """Remove gear from signal chain"""
+class SetupDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    """
+    Delete setup logic
+    """
+    model = Setup
+    template_name = 'setups/confirm_delete.html'
+    success_url = reverse_lazy('setups:list')
+
+    def test_func(self):
+        setup = self.get_object()
+        return self.request.user == setup.user
     
+    def delete(self, request, *args, **kwargs):
+        messages.success(request, "Setup deleted successfully.")
+        return super().delete(request, *args, **kwargs)
+
+class RemoveGearFromSetupView(LoginRequiredMixin, View):
     def post(self, request, setup_id, item_id):
         service = SetupService(user=request.user)
         
@@ -131,7 +147,6 @@ class RemoveGearFromSetupView(LoginRequiredMixin, View):
 
 
 class SetupListView(LoginRequiredMixin, ListView):
-    """List user's setups"""
     model = Setup
     template_name = 'setups/list.html'
     context_object_name = 'setups'
@@ -160,20 +175,64 @@ class CommunitySetupsView(ListView):
             genre=self.request.GET.get('genre'),
             band=self.request.GET.get('band'),
             song=self.request.GET.get('song'),
-            search_query=self.request.GET.get('q')
+            search_query=self.request.GET.get('q'),
+            author_username=self.request.GET.get('author') 
         )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['genres'] = Genre.objects.all().order_by('name')
-        context['songs'] = Song.objects.select_related('band').all().order_by('band__name', 'title')
+        
+        genre_id = self.request.GET.get('genre')
+        band_id = self.request.GET.get('band')
+        song_id = self.request.GET.get('song')
+
+        if song_id:
+            selected_song = Song.objects.filter(id=song_id).select_related('band', 'band__genre').first()
+            
+            if selected_song:
+                if not band_id or band_id != str(selected_song.band.id):
+                    band_id = str(selected_song.band.id)
+                
+                if not genre_id or genre_id != str(selected_song.band.genre.id):
+                    genre_id = str(selected_song.band.genre.id)
+
+        if band_id and not genre_id:
+            selected_band = Band.objects.filter(id=band_id).select_related('genre').first()
+            if selected_band:
+                genre_id = str(selected_band.genre.id)
+
+        if genre_id and band_id:
+            if not Band.objects.filter(id=band_id, genre_id=genre_id).exists():
+                band_id = None
+                song_id = None 
+
+        if band_id and song_id:
+            if not Song.objects.filter(id=song_id, band_id=band_id).exists():
+                song_id = None
+
+        genres = Genre.objects.all().order_by('name')
+        bands = Band.objects.all().order_by('name')
+        songs = Song.objects.select_related('band').all().order_by('band__name', 'title')
+
+        if genre_id:
+            bands = bands.filter(genre_id=genre_id)
+
+        if band_id:
+            songs = songs.filter(band_id=band_id)
+        elif genre_id:
+            songs = songs.filter(band__genre_id=genre_id)
+
+        context['genres'] = genres
+        context['bands'] = bands
+        context['songs'] = songs
         
         context['active_filters'] = {
-            'genre': self.request.GET.get('genre'),
-            'band': self.request.GET.get('band'),
-            'song': self.request.GET.get('song'),
+            'genre': genre_id, 
+            'band': band_id,
+            'song': song_id,
             'search': self.request.GET.get('q'),
         }
+        
         return context
 
 
@@ -193,7 +252,6 @@ class ToggleSetupFavoriteView(LoginRequiredMixin, View):
 
 
 class ToggleSetupPublicView(LoginRequiredMixin, View):
-    """Toggle Public/Private"""
     def post(self, request, setup_id):
         service = SetupService(user=request.user)
         

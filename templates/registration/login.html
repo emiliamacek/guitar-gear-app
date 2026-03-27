@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}Log In | ToneVault{% endblock %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="card border-secondary shadow-lg" style="width: 100%; max-width: 400px; background: var(--bg-card, #212529);">
+        
+        <div class="card-body p-4">
+            
+            <div class="text-center mb-4">
+                <div class="mb-3">
+                    <i class="fas fa-layer-group fa-3x" style="color: var(--accent-color);"></i>
+                </div>
+                <h2 class="text-white">Welcome Back</h2>
+                <p class="text-muted">Login to manage your tone.</p>
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+
+                {% if form.errors %}
+                <div class="alert alert-danger d-flex align-items-center mb-3" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <div>Invalid username or password.</div>
+                </div>
+                {% endif %}
+
+                <div class="mb-3">
+                    <label for="id_username" class="form-label text-muted small text-uppercase fw-bold">Username</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-dark border-secondary text-muted"><i class="fas fa-user"></i></span>
+                        {{ form.username }}
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="id_password" class="form-label text-muted small text-uppercase fw-bold">Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-dark border-secondary text-muted"><i class="fas fa-lock"></i></span>
+                        {{ form.password }}
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2 mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg">Log In</button>
+                </div>
+
+                <input type="hidden" name="next" value="{{ next }}">
+            </form>
+        </div>
+
+        <div class="card-footer bg-transparent border-secondary text-center py-3">
+            <small class="text-muted">
+                Don't have an account? <a href="{% url 'register' %}" class="text-white text-decoration-none fw-bold">Sign up here</a>.
+            </small>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Znajdź wszystkie inputy w formularzu
+        document.querySelectorAll('input').forEach(el => {
+            // Dodaj klasy Bootstrapowe
+            el.classList.add('form-control', 'bg-dark', 'text-white', 'border-secondary');
+            
+            // Ignoruj inputy hidden (np. csrf)
+            if(el.type === 'hidden') return;
+        });
+    });
+</script>
+{% endblock %}

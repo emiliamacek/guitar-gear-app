@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Gear | ToneVault{% endblock %}
+
+{% block content %}
+<div class="container d-flex justify-content-center mt-5">
+  <div class="card border-secondary shadow-lg w-100" style="max-width: 500px; background: var(--bg-card, #212529);">
+
+    <div class="card-header bg-transparent border-secondary text-center py-3">
+      <h3 class="text-white mb-0">Edit Details</h3>
+      <small class="text-muted">{{ gear.gear_item.name }}</small>
+    </div>
+
+    <div class="card-body p-4">
+      <form method="post">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+          {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+
+        {% for field in form %}
+        <div class="mb-3">
+          <label class="form-label text-muted small text-uppercase fw-bold">{{ field.label }}</label>
+
+          {% if field.name == 'is_favorite' %}
+          <div class="form-check form-switch">
+            {{ field }}
+            <label class="form-check-label text-white" for="{{ field.id_for_label }}">
+              Mark as Favorite ❤️
+            </label>
+          </div>
+          {% else %}
+          {{ field }}
+          {% endif %}
+
+          {% if field.errors %}
+          <div class="text-danger small mt-1">{{ field.errors.0 }}</div>
+          {% endif %}
+
+          {% if field.help_text %}
+          <small class="text-muted">{{ field.help_text }}</small>
+          {% endif %}
+        </div>
+        {% endfor %}
+
+        <div class="d-grid gap-2 mt-4">
+          <button type="submit" class="btn btn-primary btn-lg">Save Changes</button>
+          <a href="{% url 'equipment:list' %}" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('input[type="text"], input[type="number"], textarea, select').forEach(element => {
+    element.classList.add('form-control', 'bg-dark', 'text-white', 'border-secondary');
+  });
+  document.querySelectorAll('input[type="checkbox"]').forEach(element => {
+    element.classList.add('form-check-input');
+  });
+</script>
+{% endblock %}

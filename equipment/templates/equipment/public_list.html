@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ viewed_user.username }}'s Collection{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="mb-4">
+    <a href="{% url 'profile' viewed_user.username %}" class="text-muted text-decoration-none">
+      <i class="fas fa-arrow-left"></i> Back to Profile
+    </a>
+    <h2 class="text-white mt-2">{{ viewed_user.username }}'s Gear</h2>
+  </div>
+
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-4">
+    {% for gear in gear_list %}
+    <div class="col">
+      <div class="card h-100 border-secondary" style="background: var(--bg-card);">
+        <div style="height: 4px; background: 
+                    {% if gear.guitar %}#e74c3c
+                    {% elif gear.amplifier %}#f1c40f
+                    {% elif gear.pedal %}#3498db
+                    {% else %}#95a5a6{% endif %};">
+        </div>
+
+        <div class="card-body">
+          <span class="text-uppercase small fw-bold text-muted">{{ gear.gear_item.brand.name }}</span>
+          <h5 class="card-title text-white mt-1">{{ gear.gear_item.name }}</h5>
+
+          {% if gear.nickname %}
+          <p class="text-muted fst-italic small">"{{ gear.nickname }}"</p>
+          {% endif %}
+        </div>
+
+        <div class="card-footer bg-transparent border-top-0 pt-0">
+          <a href="{% url 'equipment:detail' gear.pk %}" class="btn btn-outline-secondary btn-sm w-100 stretched-link">
+            View Details
+          </a>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <div class="col-12 text-center text-muted">
+      <p>This user has no gear yet.</p>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

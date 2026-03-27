@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "setups.apps.SetupsConfig",
     "django_rich",
     "debug_toolbar",
+    "django_extensions",
 ]
 
 MIDDLEWARE = [
@@ -63,7 +64,7 @@ ROOT_URLCONF = "guitargear.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -133,3 +134,8 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Users
 AUTH_USER_MODEL = "users.User"
+
+# LOGIN
+LOGIN_REDIRECT_URL = "equipment:list"
+
+LOGOUT_REDIRECT_URL = "login"

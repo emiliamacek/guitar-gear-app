@@ -70,10 +70,6 @@ class SetupRepository(BaseRepository):
         Logic: Returns setup if it belongs to user OR is public.
         """
         try:
-            # Używamy self.model.objects zamiast self._get_base_queryset(),
-            # żeby ominąć sztywne filtrowanie po self.user.
-            # Dzięki temu możemy pobrać CUDZY setup, jeśli jest publiczny.
-            
             # filter user's or public (other) setup
             queryset = self.model.objects.filter(
                 Q(user=self.user) | Q(is_public=True),
@@ -89,7 +85,7 @@ class SetupRepository(BaseRepository):
         except ObjectDoesNotExist:
             return None
     
-    def get_public_setups(self, genre=None, band=None, song=None, search_query=None, optimize_signal_chain=False):
+    def get_public_setups(self, genre=None, band=None, song=None, gear_query=None, search_query=None, author_username=None, optimize_signal_chain=False):
         """
         Get public setups from ALL users (no user scoping).
         Used for Community page.
@@ -104,6 +100,17 @@ class SetupRepository(BaseRepository):
 
         if song:
             queryset = queryset.filter(song_id=song)
+
+        if author_username:
+            queryset = queryset.filter(user__username=author_username)
+
+        if gear_query:
+            queryset = queryset.filter(
+                Q(signal_chain__owned_gear__guitar__name__icontains=gear_query) |
+                Q(signal_chain__owned_gear__amplifier__name__icontains=gear_query) |
+                Q(signal_chain__owned_gear__pedal__name__icontains=gear_query)
+            ).distinct()
+        # distinct - don't show the same setup multiple times
         
         if search_query:
             queryset = queryset.filter(
@@ -112,7 +119,7 @@ class SetupRepository(BaseRepository):
                 Q(band__name__icontains=search_query) |
                 Q(song__title__icontains=search_query)
             )
-       
+        
         # Eager Loading
         queryset = queryset.select_related(
             'user', 'genre', 'band', 'song'

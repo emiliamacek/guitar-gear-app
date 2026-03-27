@@ -174,15 +174,13 @@ class SetupService:
     def get_setup_with_chain(self, setup_id):
         return self.setup_repo.get_with_signal_chain(setup_id)
     
-    def get_public_setups(self, genre=None, band=None, song=None, search_query=None):
-        # Create repo WITHOUT user (to get all public setups)
+
+    def get_public_setups(self, genre=None, band=None, song=None, gear_query=None, search_query=None, author_username=None):
         public_repo = SetupRepository()
-        
         return public_repo.get_public_setups(
-            genre=genre,
-            band=band,
-            song=song,
-            search_query=search_query
+            genre=genre, band=band, song=song, 
+            gear_query=gear_query, search_query=search_query,
+            author_username=author_username # <--- Przekazujemy
         )
     
     def increment_views(self, setup_id):

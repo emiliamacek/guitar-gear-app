@@ -11,6 +11,8 @@ urlpatterns = [
 
     path('<int:pk>/', views.SetupDetailView.as_view(), name='detail'),
     path('<int:pk>/edit/', views.SetupUpdateView.as_view(), name='update'),
+    path('<int:pk>/delete/', views.SetupDeleteView.as_view(), name='delete'),
+
     path('<int:setup_id>/remove/<int:item_id>/', views.RemoveGearFromSetupView.as_view(), name='remove_gear'),
     path('<int:setup_id>/toggle-favorite/', views.ToggleSetupFavoriteView.as_view(), name='toggle_favorite'),
     path('<int:setup_id>/toggle-public/', views.ToggleSetupPublicView.as_view(), name='toggle_public'),

@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ gear.gear_item.name }} | ToneVault{% endblock %}
+
+{% block content %}
+<div class="container mt-4" style="max-width: 800px;">
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <span class="badge bg-secondary mb-2">{{ gear.gear_item.brand.name }}</carh1>
+      {% if gear.nickname %}
+      <p class="text-muted fst-italic lead">"{{ gear.nickname }}"</p>
+      {% endif %}
+    </div>
+
+    <div class="text-muted opacity-50 display-4">
+      {% if gear.guitar %}🎸
+      {% elif gear.amplifier %}📢
+      {% elif gear.pedal %}🎛️
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="card border-secondary mb-4" style="background: var(--bg-card, #212529);">
+    <div class="card-body p-4">
+
+      <div class="row g-4">
+        <div class="col-md-6 border-end border-secondary">
+          <h5 class="text-warning mb-3">Ownership Details</h5>
+
+          <ul class="list-unstyled text-light">
+            <li class="mb-2">
+              <strong>Added:</strong> <span class="text-muted">{{ gear.created_at|date:"M d, Y" }}</span>
+            </li>
+            <li class="mb-2">
+              <strong>Serial Number:</strong>
+              <span class="text-white">{{ gear.serial_number|default:"Not specified" }}</span>
+            </li>
+            <li class="mb-2">
+              <strong>Favorite:</strong>
+              {% if gear.is_favorite %}
+              <span class="text-danger"><i class="fas fa-heart"></i> Yes</span>
+              {% else %}
+              <span class="text-muted">No</span>
+              {% endif %}
+            </li>
+          </ul>
+        </div>
+
+        <div class="col-md-6">
+          <h5 class="text-info mb-3">Tech Specs</h5>
+
+          <ul class="list-unstyled text-light">
+            {% if gear.guitar %}
+            <li class="mb-2"><strong>Type:</strong> Guitar</li>
+            <li class="mb-2"><strong>Body Shape:</strong> {{ gear.guitar.body_shape }}</li>
+            <li class="mb-2"><strong>Strings:</strong> {{ gear.guitar.num_strings }}</li>
+
+            {% elif gear.amplifier %}
+            <li class="mb-2"><strong>Type:</strong> Amplifier</li>
+            <li class="mb-2"><strong>Tech:</strong> {{ gear.amplifier.amp_type }}</li>
+            <li class="mb-2"><strong>Wattage:</strong> {{ gear.amplifier.wattage }}W</li>
+
+            {% elif gear.pedal %}
+            <li class="mb-2"><strong>Type:</strong> Pedal</li>
+            <li class="mb-2"><strong>Effect:</strong> {{ gear.pedal.pedal_type }}</li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+
+    </div>
+
+<div class="card-footer bg-transparent border-secondary p-3 d-flex justify-content-between">
+            <a href="javascript:history.back()" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+            
+            {% if user == gear.user %}
+            <div>
+                <a href="{% url 'equipment:update' gear.pk %}" class="btn btn-warning me-2">
+                    <i class="fas fa-edit"></i> Edit Details
+                </a>
+                <a href="{% url 'equipment:delete' gear.pk %}" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Remove
+                </a>
+            </div>
+            {% endif %}
+        </div>
+  </div>
+
+</div>
+{% endblock %}

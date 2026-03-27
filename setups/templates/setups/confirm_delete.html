@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 60vh;">
+  <div class="card bg-dark border-secondary shadow-lg" style="max-width: 500px;">
+    <div class="card-body text-center p-5">
+      <div class="mb-4 text-danger">
+        <i class="fas fa-exclamation-triangle fa-3x"></i>
+      </div>
+      <h3 class="text-white mb-3">Delete Setup?</h3>
+      <p class="text-muted">
+        Are you sure you want to delete <strong>"{{ object.name }}"</strong>?<br>
+        This action cannot be undone.
+      </p>
+
+      <form method="post" class="mt-4">
+        {% csrf_token %}
+        <div class="d-grid gap-2">
+          <button type="submit" class="btn btn-danger btn-lg">Yes, Delete It</button>
+          <a href="{% url 'setups:detail' object.pk %}" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

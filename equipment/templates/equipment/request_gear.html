@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container" style="max-width: 600px;">
+  <div class="card shadow-lg border-0" style="background: var(--bg-card);">
+    <div class="card-body p-5">
+      <div class="text-center mb-4">
+        <i class="fas fa-bullhorn fa-3x text-warning mb-3"></i>
+        <h2 class="text-white">Request Missing Gear</h2>
+        <p class="text-muted">Can't find your gear in our catalog? Let us know!</p>
+      </div>
+
+      <form method="post">
+        {% csrf_token %}
+
+        {% for field in form %}
+        <div class="mb-3">
+          <label class="form-label text-muted small text-uppercase fw-bold">{{ field.label }}</label>
+          {{ field }} {% if field.errors %}
+          <div class="text-danger small mt-1">{{ field.errors.0 }}</div>
+          {% endif %}
+        </div>
+        {% endfor %}
+
+        <div class="d-grid gap-2 mt-4">
+          <button type="submit" class="btn btn-warning">Send Request</button>
+          <a href="{% url 'equipment:catalog_search' %}" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('input, select').forEach(element => {
+    element.classList.add('form-control');
+    if (element.tagName === 'SELECT') element.classList.add('form-select');
+  });
+</script>
+{% endblock %}

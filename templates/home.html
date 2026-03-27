@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="px-4 py-5 my-5 text-center">
+  <div style="font-size: 4rem; color: var(--accent-color); margin-bottom: 20px;">
+    <i class="fas fa-layer-group"></i>
+  </div>
+  <h1 class="display-5 fw-bold text-white">Welcome to ToneVault</h1>
+  <div class="col-lg-6 mx-auto">
+    <p class="lead mb-4 text-muted">
+      The ultimate database for your guitars, amps, and pedals.
+      Build your signal chains, share your setups, and discover tones from the community.
+    </p>
+
+    <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+      {% if user.is_authenticated %}
+      <a href="{% url 'equipment:list' %}" class="btn btn-primary btn-lg px-4 gap-3">
+        <i class="fas fa-guitar"></i> My Gear
+      </a>
+      <a href="{% url 'setups:list' %}" class="btn btn-outline-light btn-lg px-4">
+        <i class="fas fa-sliders-h"></i> My Setups
+      </a>
+      {% else %}
+      <a href="{% url 'login' %}" class="btn btn-primary btn-lg px-4 gap-3">Log In</a>
+      <a href="{% url 'register' %}" class="btn btn-outline-light btn-lg px-4">Sign Up</a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="container mt-5">
+  <h3 class="border-bottom pb-2 mb-4 border-secondary text-white">Latest from Community</h3>
+  <div class="row row-cols-1 row-cols-md-3 g-4">
+    {% for setup in latest_setups %}
+    <div class="col">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title text-white">{{ setup.name }}</h5>
+          <h6 class="card-subtitle mb-2 text-muted">
+            Created by
+          <a href="{% url 'profile' setup.user.username %}" 
+             class="text-white text-decoration-none fw-bold"
+             style="position: relative; z-index: 2;">
+            {{ setup.user.username }}
+          </a>
+          </h6>
+
+          <p class="card-text small">
+            {% if setup.genre %}🎵 {{ setup.genre.name }}{% endif %}
+            {% if setup.band %}🎸 {{ setup.band.name }}{% endif %}
+          </p>
+        </div>
+        <div class="card-footer bg-transparent border-top-0">
+          <a href="{% url 'setups:detail' setup.pk %}" class="btn btn-sm btn-outline-primary w-100">View Setup</a>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <p class="text-muted">No public setups yet. Be the first!</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

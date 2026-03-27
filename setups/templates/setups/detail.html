@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ setup.name }} | ToneVault{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="mb-0">{{ setup.name }}</h1>
+            <div class="mt-1">
+                {% if setup.is_public %}
+                    <span class="badge bg-success">Public</span>
+                {% else %}
+                    <span class="badge bg-secondary">Private</span>
+                {% endif %}
+                <span class="text-muted ms-2"><i class="fas fa-music"></i> {{ setup.genre.name|default:"No Genre" }}</span>
+            </div>
+        </div>
+        
+        {% if user == setup.user %}
+        <div>
+            <form action="{% url 'setups:toggle_public' setup.pk %}" method="post" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-light btn-sm me-2">
+                    {% if setup.is_public %}Make Private{% else %}Make Public{% endif %}
+                </button>
+            </form>
+            
+            <a href="{% url 'setups:update' setup.pk %}" class="btn btn-warning btn-sm">
+                <i class="fas fa-edit"></i> Edit
+            </a>
+            <a href="{% url 'setups:delete' setup.pk %}" class="btn btn-danger btn-sm">
+                <i class="fas fa-trash"></i> Delete
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            
+            <div class="card mb-4 border-0 bg-dark">
+                <div class="card-body">
+                    <h5 class="text-white">About this tone</h5>
+                    <p class="text-muted mb-0">
+                        {{ setup.description|default:"No description provided." }}
+                    </p>
+                    {% if setup.band or setup.song %}
+                    <hr class="border-secondary">
+                    <p class="mb-0 text-white">
+                        Inspired by: <strong>{{ setup.band.name }}</strong> 
+                        {% if setup.song %} - <em>{{ setup.song.title }}</em>{% endif %}
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <h4 class="mb-3">Signal Chain</h4>
+            <div class="list-group mb-5">
+                {% for item in signal_chain %}
+                <div class="list-group-item bg-dark border-secondary text-white d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                        <span class="badge bg-secondary rounded-circle me-3">{{ item.order }}</span>
+                        <div>
+                            <h5 class="mb-0">{{ item.owned_gear.gear_item.name }}</h5>
+                            <small class="text-muted">{{ item.owned_gear.nickname }}</small>
+                            {% if item.settings or item.notes %}
+                            <div class="mt-1 small text-warning">
+                                <i class="fas fa-sliders-h"></i> 
+                                {{ item.settings|default:"" }} 
+                                {{ item.notes|default:"" }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    {% if user == setup.user %}
+                    <form action="{% url 'setups:remove_gear' setup.pk item.pk %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-link text-danger p-0" title="Remove from chain">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+                {% empty %}
+                <div class="text-center py-5 border border-secondary border-dashed rounded text-muted">
+                    <i class="fas fa-plug fa-2x mb-3"></i>
+                    <p>Signal chain is empty.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        {% if user == setup.user %}
+        <div class="col-lg-4">
+            <div class="card border-0 bg-secondary bg-opacity-10">
+                <div class="card-body">
+                    <h5 class="mb-3 text-white">Add Gear to Chain</h5>
+                    <form method="post">
+                        {% csrf_token %}
+                        {% for field in add_gear_form %}
+                        <div class="mb-3">
+                            <label class="form-label small text-uppercase text-muted">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                                <div class="text-danger small">{{ field.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-plus"></i> Add to Chain
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    document.querySelectorAll('input, select, textarea').forEach(el => {
+        el.classList.add('form-control', 'bg-dark', 'text-white', 'border-secondary');
+        if(el.tagName === 'SELECT') el.classList.add('form-select');
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h2>Community Tones</h2>
+    <p class="text-muted">Explore setups created by other musicians.</p>
+  </div>
+</div>
+
+<div class="card mb-4 border-0" style="background: var(--bg-card);">
+  <div class="card-body p-3">
+<form method="get" class="row g-3">
+  
+  <div class="col-md-3">
+    <input type="text" name="q" class="form-control" placeholder="Search setups..." 
+           value="{{ active_filters.search|default:'' }}">
+  </div>
+  
+  <div class="col-md-2">
+    <select name="genre" class="form-select" onchange="this.form.submit()">
+        <option value="">All Genres</option>
+        {% for g in genres %}
+            <option value="{{ g.id }}" {% if active_filters.genre|stringformat:"s" == g.id|stringformat:"s" %}selected{% endif %}>
+                {{ g.name }}
+            </option>
+        {% endfor %}
+    </select>
+  </div>
+
+  <div class="col-md-3">
+    <select name="band" class="form-select" onchange="this.form.submit()">
+        <option value="">All Bands</option>
+        {% for b in bands %}
+            <option value="{{ b.id }}" {% if active_filters.band|stringformat:"s" == b.id|stringformat:"s" %}selected{% endif %}>
+                {{ b.name }}
+            </option>
+        {% endfor %}
+    </select>
+  </div>
+
+  <div class="col-md-3">
+    <select name="song" class="form-select" onchange="this.form.submit()">
+        <option value="">All Songs</option>
+        {% for s in songs %}
+            <option value="{{ s.id }}" {% if active_filters.song|stringformat:"s" == s.id|stringformat:"s" %}selected{% endif %}>
+                {{ s.title }} ({{ s.band.name }})
+            </option>
+        {% endfor %}
+    </select>
+  </div>
+
+  <div class="col-md-1">
+    <a href="{% url 'setups:community' %}" class="btn btn-outline-danger w-100" title="Clear Filters">
+        <i class="fas fa-times"></i>
+    </a>
+  </div>
+</form>
+  </div>
+</div>
+
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+  {% for setup in setups %}
+  <div class="col">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="d-flex justify-content-between mb-2">
+          <span class="badge bg-secondary">{{ setup.genre.name|default:"No Genre" }}</span>
+          <small class="text-muted">{{ setup.created_at|date:"M d, Y" }}</small>
+        </div>
+
+        <h4 class="card-title text-white">
+          <a href="{% url 'setups:detail' setup.pk %}" class="text-decoration-none text-white stretched-link">
+            {{ setup.name }}
+          </a>
+        </h4>
+
+      <p class="text-muted small mb-3">
+          Created by 
+          <a href="{% url 'profile' setup.user.username %}" 
+             class="text-white text-decoration-none fw-bold"
+             style="position: relative; z-index: 2;">
+            {{ setup.user.username }}
+          </a>
+        </p>
+
+        {% if setup.band %}
+        <div class="alert alert-dark py-1 px-2 d-inline-block small mb-0">
+          🎸 {{ setup.band.name }}
+          {% if setup.song %} - {{ setup.song.title }}{% endif %}
+        </div>
+        {% endif %}
+
+        <div class="mt-3 d-flex justify-content-between align-items-center" style="position: relative; z-index: 2;"> 
+            <div class="text-muted small">
+                <span><i class="fas fa-eye"></i> {{ setup.views }}</span>
+                <span class="ms-2"><i class="fas fa-bookmark"></i> {{ setup.saved_by.count }}</span>
+                <span class="ms-2"><i class="fas fa-link"></i> {{ setup.signal_chain.count }} items</span>
+            </div>
+
+            {% if user.is_authenticated %}
+            <form action="{% url 'setups:toggle_save' setup.pk %}" method="post" style="margin: 0;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm {% if user in setup.saved_by.all %}btn-warning{% else %}btn-outline-secondary{% endif %}" 
+                        title="Save to Collection">
+                    <i class="fas {% if user in setup.saved_by.all %}fa-bookmark{% else %}fa-bookmark{% endif %}"></i>
+                    {% if user in setup.saved_by.all %}Saved{% else %}Save{% endif %}
+                </button>
+            </form>
+            {% endif %}
+        </div>
+
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <div class="col-12 text-center py-5">
+    <h3>Nothing here yet 🕸️</h3>
+    <p class="text-muted">Make your setups "Public" to see them here.</p>
+  </div>
+  {% endfor %}
+</div>
+
+{% if is_paginated %}
+<div class="mt-4">
+  <ul class="pagination justify-content-center">
+    {% if page_obj.has_previous %}
+    <li class="page-item"><a class="page-link bg-dark border-secondary text-white"
+        href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+    {% endif %}
+    <li class="page-item disabled"><span class="page-link bg-dark border-secondary text-white">{{ page_obj.number }} /
+        {{ page_obj.paginator.num_pages }}</span></li>
+    {% if page_obj.has_next %}
+    <li class="page-item"><a class="page-link bg-dark border-secondary text-white"
+        href="?page={{ page_obj.next_page_number }}">Next</a></li>
+    {% endif %}
+  </ul>
+</div>
+{% endif %}
+
+{% endblock %}

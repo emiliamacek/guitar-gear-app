@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+
+{% block title %}Add {{ gear_type }} - ToneVault{% endblock %}
+
+{% block content %}
+<div class="container d-flex justify-content-center mt-4">
+    <div class="w-100" style="max-width: 600px;">
+
+        <div class="mb-3">
+            <a href="{% url 'equipment:add_options' %}" class="text-decoration-none text-muted hover-light">
+                <i class="fas fa-arrow-left me-2"></i> Back to Options
+            </a>
+        </div>
+
+        <div class="card border-secondary shadow-lg" style="background: var(--bg-card, #212529);">
+            
+            <div class="card-header bg-transparent border-secondary py-3 text-center">
+                <div class="mb-2" style="font-size: 2.5rem;">
+                    {% if gear_type == 'Guitar' %}🎸
+                    {% elif gear_type == 'Amplifier' %}📢
+                    {% elif gear_type == 'Pedal' %}🎛️
+                    {% endif %}
+                </div>
+                <h2 class="h4 text-white mb-0">Add Custom {{ gear_type }}</h2>
+                <p class="text-muted small mb-0">Enter the details manually</p>
+            </div>
+
+            <div class="card-body p-4">
+                <form method="post">
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger d-flex align-items-center" role="alert">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <div>{{ form.non_field_errors }}</div>
+                    </div>
+                    {% endif %}
+
+                    {% for field in form %}
+                    <div class="mb-3">
+                        <label for="{{ field.id_for_label }}" class="form-label text-muted small text-uppercase fw-bold">
+                            {{ field.label }}
+                            {% if field.field.required %}<span class="text-danger">*</span>{% endif %}
+                        </label>
+
+                        {% if field.name == 'is_favorite' %}
+                            <div class="form-check form-switch p-0">
+                                <div class="d-flex align-items-center border border-secondary rounded p-2 bg-dark">
+                                    <div class="form-check form-switch ms-2">
+                                        {{ field }}
+                                    </div>
+                                    <span class="text-white ms-2">Add to Favorites ❤️</span>
+                                </div>
+                            </div>
+                        {% else %}
+                            {{ field }}
+                        {% endif %}
+
+                        {% if field.help_text %}
+                        <div class="form-text text-muted">{{ field.help_text }}</div>
+                        {% endif %}
+
+                        {% if field.errors %}
+                        <div class="text-danger small mt-1">
+                            <i class="fas fa-exclamation-triangle me-1"></i> {{ field.errors.0 }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-save me-2"></i> Save to Collection
+                        </button>
+                        <a href="{% url 'equipment:list' %}" class="btn btn-outline-secondary">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Stylujemy wszystkie inputy tekstowe, number i selecty
+        document.querySelectorAll('input:not([type="checkbox"]), select, textarea').forEach(el => {
+            el.classList.add('form-control', 'bg-dark', 'text-white', 'border-secondary');
+            
+            // Jeśli to select, dodajemy klasę form-select dla ładniejszej strzałki
+            if (el.tagName === 'SELECT') {
+                el.classList.remove('form-control');
+                el.classList.add('form-select');
+            }
+        });
+
+        // Stylujemy checkbox na switch
+        document.querySelectorAll('input[type="checkbox"]').forEach(el => {
+            el.classList.add('form-check-input');
+            el.style.cursor = 'pointer';
+        });
+    });
+</script>
+
+<style>
+    /* Dodatkowe poprawki dla selecta, żeby opcje były czytelne */
+    select option {
+        background-color: #212529;
+        color: white;
+    }
+    /* Efekt hover na linku powrotu */
+    .hover-light:hover {
+        color: #fff !important;
+    }
+    /* Placeholder color */
+    ::placeholder {
+        color: #6c757d !important;
+        opacity: 1;
+    }
+</style>
+{% endblock %}

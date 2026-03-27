@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid px-0">
+
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+        <div>
+            <h2 class="mb-1 text-white">My Collection</h2>
+            <p class="text-muted mb-0">Manage your arsenal of tone.</p>
+        </div>
+        <div class="mt-3 mt-md-0">
+            <a href="{% url 'equipment:add_options' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i> Add Gear
+            </a>
+        </div>
+    </div>
+
+    <div class="card mb-4 border-0" style="background: var(--bg-card);">
+        <div class="card-body p-3">
+            <form method="get" action="." class="row g-3 align-items-center">
+                
+                <div class="col-md-3">
+                    <div class="input-group">
+                        <span class="input-group-text bg-dark border-secondary text-muted"><i class="fas fa-search"></i></span>
+                        <input type="text" name="q" class="form-control bg-dark text-white border-secondary" 
+                               placeholder="Search gear..." value="{{ active_filters.search|default:'' }}">
+                    </div>
+                </div>
+
+                <div class="col-md-2">
+                    <select name="type" class="form-select bg-dark text-white border-secondary" onchange="this.form.submit()">
+                        <option value="">All Types</option>
+                        <option value="guitar" {% if 'guitar' in active_filters.types %}selected{% endif %}>🎸 Guitars</option>
+                        <option value="amplifier" {% if 'amplifier' in active_filters.types %}selected{% endif %}>📢 Amps</option>
+                        <option value="pedal" {% if 'pedal' in active_filters.types %}selected{% endif %}>🎛️ Pedals</option>
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <select name="brand" class="form-select bg-dark text-white border-secondary" onchange="this.form.submit()">
+                        <option value="">All Brands</option>
+                        {% for brand in brands %}
+                            <option value="{{ brand.id }}" {% if active_filters.brand|stringformat:"s" == brand.id|stringformat:"s" %}selected{% endif %}>
+                                {{ brand.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-1">
+                    <a href="{% url 'equipment:list' %}" class="btn btn-outline-danger w-100" title="Clear Filters">
+                        <i class="fas fa-times"></i>
+                    </a>
+                </div>
+
+                <div class="col-md-4 text-md-end d-none d-md-block">
+                    <span class="badge bg-dark border border-secondary text-muted me-2" title="Guitars">
+                        🎸 {{ gear_stats.guitars }}
+                    </span>
+                    <span class="badge bg-dark border border-secondary text-muted me-2" title="Amplifiers">
+                        📢 {{ gear_stats.amplifiers }}
+                    </span>
+                    <span class="badge bg-dark border border-secondary text-muted" title="Pedals">
+                        🎛️ {{ gear_stats.pedals }}
+                    </span>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-4">
+        {% for gear in gear_list %}
+        <div class="col">
+            <div class="card h-100 gear-card position-relative overflow-hidden border-secondary" style="background: var(--bg-card);">
+                
+                <div style="height: 4px; background: 
+                    {% if gear.guitar %}#e74c3c
+                    {% elif gear.amplifier %}#f1c40f
+                    {% elif gear.pedal %}#3498db
+                    {% else %}#95a5a6{% endif %};">
+                </div>
+
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <span class="text-uppercase small fw-bold text-muted tracking-wider">
+                            {{ gear.gear_item.brand.name }}
+                        </span>
+                        {% if gear.is_favorite %}
+                            <i class="fas fa-heart text-danger" title="Favorite"></i>
+                        {% endif %}
+                    </div>
+
+                    <h5 class="card-title mb-1 text-white text-truncate">{{ gear.gear_item.name }}</h5>
+
+                    {% if gear.nickname %}
+                        <p class="text-muted fst-italic small mb-3 text-truncate">"{{ gear.nickname }}"</p>
+                    {% else %}
+                        <div class="mb-3"></div> 
+                    {% endif %}
+
+                    <div class="d-flex flex-wrap gap-2">
+                        <span class="badge bg-dark border border-secondary fw-normal text-light">
+                            {% if gear.guitar %}Guitar{% elif gear.amplifier %}Amp{% elif gear.pedal %}Pedal{% endif %}
+                        </span>
+                        {% if gear.serial_number %}
+                        <span class="badge bg-dark border border-secondary fw-normal text-muted">
+                            SN: {{ gear.serial_number }}
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="card-footer bg-transparent border-top-0 pt-0">
+                    <a href="{% url 'equipment:detail' gear.pk %}" class="btn btn-outline-secondary btn-sm w-100 stretched-link">
+                        View Details
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="text-center py-5 rounded-3" style="border: 2px dashed var(--border-color);">
+                <div class="mb-3" style="font-size: 3rem; color: var(--text-muted); opacity: 0.3;">
+                    <i class="fas fa-ghost"></i>
+                </div>
+                <h4 class="text-muted">No gear found</h4>
+                <p class="text-muted mb-4">Your collection is empty. Time to go shopping?</p>
+                <a href="{% url 'equipment:add_options' %}" class="btn btn-primary">
+                    Start Adding Gear
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+{% endblock %}

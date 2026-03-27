@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit {{ setup.name }}{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 700px;">
+
+  <div class="card shadow-lg border-0" style="background: var(--bg-card);">
+    <div class="card-body p-5">
+      <h2 class="mb-4 text-white">✏️ Edit Setup</h2>
+
+      <form method="post">
+        {% csrf_token %}
+
+        {% for field in form %}
+        <div class="mb-3">
+          <label class="form-label text-muted small text-uppercase fw-bold">{{ field.label }}</label>
+          {{ field }}
+          {% if field.errors %}
+          <div class="text-danger small mt-1">{{ field.errors.0 }}</div>
+          {% endif %}
+        </div>
+        {% endfor %}
+
+        <div class="d-flex gap-2 mt-4">
+          <button type="submit" class="btn btn-primary px-4">Save Changes</button>
+          <a href="{% url 'setups:detail' object.pk %}" class="btn btn-outline-secondary px-4">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
