@@ -37,5 +37,20 @@ python manage.py seed_users  # Loads user community and setups
 ```bash
 python manage.py runserver
 ```
+4. **Test account**: Login as `jimi_hendrix` with password `purple_haze`
 
 ## Preview
+
+1. **Profile page**
+<img width="2560" height="1440" alt="image" src="https://github.com/user-attachments/assets/6551d2d3-24b6-451c-8184-a22adbe0ee12" />
+
+
+2. **Setup configuration**
+<img width="2560" height="1440" alt="image" src="https://github.com/user-attachments/assets/72e1228f-a3f9-4467-980e-f5e6c0245f7f" />
+
+
+3. **User's collection**
+<img width="2560" height="1440" alt="image" src="https://github.com/user-attachments/assets/e0c3b5b0-1b28-449a-a629-a48ce4577f7d" />
+
+
+
