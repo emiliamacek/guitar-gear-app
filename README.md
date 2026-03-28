@@ -5,7 +5,7 @@
 ![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)
 ![Django](https://img.shields.io/badge/Django-5.0+-092E20.svg)
 
-ToneValt is an application to help musicians organize their gear collection and remember the exact settings (signal chains) used for specific genres/songs. 
+ToneVault is an application to help musicians organize their gear collection and remember the exact settings (signal chains) used for specific genres/songs. 
 
 ## Features
 * **Gear Vault:** Manage your guitars, amps, and pedals (from a global catalog or add custom items).
