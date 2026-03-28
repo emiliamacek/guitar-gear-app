@@ -42,15 +42,13 @@ python manage.py runserver
 ## Preview
 
 1. **Profile page**
-<img width="2560" height="1440" alt="image" src="https://github.com/user-attachments/assets/6551d2d3-24b6-451c-8184-a22adbe0ee12" />
+<img width="2503" height="1332" alt="image" src="https://github.com/user-attachments/assets/0682762f-e6fa-416d-b326-77b1d095f373" />
 
 
 2. **Setup configuration**
-<img width="2560" height="1440" alt="image" src="https://github.com/user-attachments/assets/72e1228f-a3f9-4467-980e-f5e6c0245f7f" />
+<img width="2503" height="1332" alt="image" src="https://github.com/user-attachments/assets/7a41b4c7-6796-40b1-b4fd-e94b4fdb0c6d" />
 
 
 3. **User's collection**
-<img width="2560" height="1440" alt="image" src="https://github.com/user-attachments/assets/e0c3b5b0-1b28-449a-a629-a48ce4577f7d" />
-
-
+<img width="2503" height="1332" alt="image" src="https://github.com/user-attachments/assets/ccfcb7dc-11c0-45b8-85ff-d884f59bac62" />
 
